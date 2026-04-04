@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../lib/react.js"></script>
+    <script src="../lib/react-dom.js"></script>
+    <script src="../lib/babel.js"></script>
+    <script type="text/babel">
+      const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+      class App extends React.Component {
+        constructor() {
+          super();
+          this.state = {
+            message: "Hello World",
+            title: "测试title",
+            href: "https://www.baidu.com",
+            isActive: true,
+          };
+        }
+        render() {
+          const { message, title, href, isActive } = this.state;
+          // 绑定方式一
+          // const className = `aaa bbb ${isActive ? "ccc" : ""}`
+          // 绑定方式二
+          const className = ["aaa", "bbb"];
+          // 绑定方式三：classnames 第三方库
+          if (isActive) className.push("ccc");
+          return (
+            <div>
+              {/* 基本绑定 */}
+              <h2 title={title}>{message}</h2>
+              <a href={href}>百度一下</a>
+              {/* class绑定方式 最好使用className */}
+              <div className={className.join(" ")}>233</div>
+              {/* style绑定方式 对象绑定 */}
+              <h2 style={{ color: "red" }}>233333</h2>
+            </div>
+          );
+        }
+      }
+
+      root.render(<App />);
+    </script>
+  </body>
+</html>

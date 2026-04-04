@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../lib/react.js"></script>
+    <script src="../lib/react-dom.js"></script>
+    <script src="../lib/babel.js"></script>
+    <script type="text/babel">
+      const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+      class App extends React.Component {
+        constructor() {
+          super();
+          this.state = {
+            message: "Hello World",
+            age: 18,
+            subject: ["js", "css", "html"],
+            aaa: undefined,
+            bbb: null,
+            ccc: true
+          };
+        }
+        render() {
+          const { message, age, subject } = this.state;
+          const {aaa, bbb, ccc} = this.state;
+          return (
+            <div>
+              {/* JSX注释 */}
+              <h2>{message}</h2>
+              <h2>{age}</h2>
+              <h3>{subject}</h3>
+
+              <h2>{aaa}</h2>
+              <h2>{bbb}</h2>
+              <h2>{ccc}</h2>
+            </div>
+          );
+        }
+      }
+
+      root.render(<App />);
+    </script>
+  </body>
+</html>

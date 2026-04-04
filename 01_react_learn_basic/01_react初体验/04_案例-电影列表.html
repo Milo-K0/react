@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../lib/react.js"></script>
+    <script src="../lib/react-dom.js"></script>
+    <script src="../lib/babel.js"></script>
+    <script type="text/babel">
+      const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+      class App extends React.Component {
+        constructor() {
+          super();
+          this.state = {
+            movies: [
+              "熊出没",
+              "喜羊羊与灰太狼",
+              "超兽武装",
+              "甜心格格",
+              "火力少年王",
+            ],
+          };
+        }
+
+        render() {
+          // const lis = [];
+          // for (let movie of this.state.movies) {
+          //   lis.push(<li>{movie}</li>);
+          // }
+          return (
+            <div>
+              <h3>电影列表</h3>
+              <ul>
+                {this.state.movies.map((movie) => (
+                  <li>{movie}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+      }
+
+      root.render(<App />);
+    </script>
+  </body>
+</html>
