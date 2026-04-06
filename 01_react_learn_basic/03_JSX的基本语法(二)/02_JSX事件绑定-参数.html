@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../lib/react.js"></script>
+    <script src="../lib/react-dom.js"></script>
+    <script src="../lib/babel.js"></script>
+    <script type="text/babel">
+      const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+      class App extends React.Component {
+        constructor() {
+          super();
+          this.state = {
+            message: "Hello World",
+          };
+        }
+        btnClick(event, name, age) {
+          console.log(event, this);
+          console.log(name, age);
+        }
+        render() {
+          const { message } = this.state;
+          return (
+            <div>
+              {/* JSX注释 */}
+              <h2>{message}</h2>
+              {/* event参数传递 */}
+              <button onClick={this.btnClick.bind(this)}>按钮1</button>
+              <button onClick={(event) => this.btnClick(event)}>按钮2</button>
+              {/* 普通参数传递 */}
+              <button onClick={this.btnClick.bind(this, event, "mdk", 18)}>
+                按钮3
+              </button>
+              <button onClick={(event) => this.btnClick(event, "mdl", 21)}>
+                按钮4
+              </button>
+            </div>
+          );
+        }
+      }
+
+      root.render(<App />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../lib/react.js"></script>
+    <script src="../lib/react-dom.js"></script>
+    <script src="../lib/babel.js"></script>
+    <script type="text/babel">
+      const root = ReactDOM.createRoot(document.querySelector("#root"));
+
+      class App extends React.Component {
+        constructor() {
+          super();
+          this.state = {
+            message: "请尽快准备",
+            readyMessage: "开始战斗!",
+            isReady: true,
+            friend: {
+              name: "irving",
+              says: "man what can i say",
+            },
+          };
+        }
+        render() {
+          const { message, readyMessage, isReady, friend } = this.state;
+          let showDiv = null;
+          if (isReady) {
+            showDiv = <h2>{readyMessage}</h2>;
+          } else {
+            showDiv = <h2>{message}</h2>;
+          }
+          return (
+            <div>
+              {/* 条件判断方式一：if else */}
+              <h2>{showDiv}</h2>
+              {/* 条件判断方式二：三元运算符 */}
+              {isReady ? <h2>{readyMessage}</h2> : <h2>{message}</h2>}
+              {/* 条件判断方式三：逻辑与 && */}
+              {friend && friend.name + " " + friend.says}
+            </div>
+          );
+        }
+      }
+
+      root.render(<App />);
+    </script>
+  </body>
+</html>
