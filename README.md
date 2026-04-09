@@ -695,9 +695,105 @@ componentWillUnmount
 - 父组件通过 **属性=值**的形式来传递给子组件数据;
 - 子组件通过**props**参数获取父组件传递过来的数据；
 
+**父组件给子组件传递数据**
+
+> 项目位置：03_learn_react_component\src\04_组件通信-父传子
+
+**参数PropTypes**
+
+对于传递给子组件的数据，有时候我们可能希望进行验证，特别是对于大型项目来说：
+
+- 当然如果项目中默认继承了Flow或者TypeScript，那么直接就可以进行类型验证；
+- 但是即使我们没有使用Flow或者TypeScript，也可以通过prop-types库进行参数验证；
+
+从React v15.5 开始，React.PropTypes已移另个包中：prop-types库
+
+如果没有传递，我们希望有默认值呢❓
+
+- 我们使用defaultProps就可以了
+
+**子组件传递父组件**
+
+某些情况我们也需要子组件向父组件传递消息：
+
+- 在vue中是通过自定义事件来完成的；
+- 在React中同样是通过props传递消息，只是让父组件给子组件传递一个回调函数，在子组件中调用这个函数即可；
+
+我们在这里完成一个案例：
+
+- 将计数器案例进行拆解；
+- 将按钮封装到子组件中：CounterButton；
+- CounterButton发生点击事件，将内容传递到父组件中，修改counter的值；
+
+文件位置：react\03_learn_react_component\src\05_组件通信-子传父
+
 #### 4. React组件插槽用法
 
+在开发中，我们抽离了一个组件，但是为了这个组件具备更强的通用性，我们不能将组件中的内容限制为固定的div、span等等这些元素。
+
+我们应该让使用者可以决定某一块区域到底存放什么内容。
+
+这种需求在Vue中有一个固定的做法是通过slot来完成的，React呢❓
+
+React对于这种需要插槽的情况非常灵活，有两种方案可以实现：
+
+- 组件的children子元素；
+- props属性传递React元素；
+
 #### 5. React非父子的通信
+
+**Context应用场景**
+
+非父子组件数据的共享：
+
+- 在开发中，比较常见的数据传递方式是通过props属性自上而下(由父到子)进行传递。
+- 但是对于有一些场景：比如一些数据需要在多个组件中进行共享(地区偏好、UI主题、用户登录状态、用户信息等)
+- 如果我们在顶层的App中定义了这些信息，之后一层层传递下去，那么对于一些中间层不需要数据的组件来说，是一种冗余的操作。
+
+但是，如果层级更高的话，一层层传递时是非常麻烦的，并且代码是非常冗余的：
+
+- React 提供了一个API：Context；
+- Context 提供了一种在组件之间共享此类值的方式，而不必显示地通过组件树的逐层传递 props；
+- Context 设计目的是为了共享那些对于一个组件书而言是"全局"的数据，例如当前认证的用户、主题或首选语言；
+
+**Context相关API**
+
+React.createContext
+
+- 创建一个需要共享的Context对象：
+- 如果一个组件订阅了Context，那么这个组件就会从离自身最近的那个匹配的Provider中读取到当前的context值；
+- defaultValue 是组件在顶层查找过程中没有找到对应的Provider，那么就使用默认值
+
+Context.Provider
+
+- 每个 Context 对象都会返回一个 Provider React 组件，它允许消费组件订阅 context 的变化：
+- Provider 接收一个 value 属性，传递给消费组件；
+- 一个 Provider 可以和多个消费组件有对应关系；
+- 多个Provider 也可以嵌套使用，里层的会覆盖外层的数据；
+- 当Provider 的value值发生变化时，它内部的所有消费组件都会被重新渲染；
+
+Class.contextType
+
+- 挂载在class上的contextType 属性会被重赋值为一个由React.createContext()创建的Context对象；
+- 这样能让你使用 this.context 来消费最近 Context 上的那个值；
+- 你可以在任何生命周期中访问到它，包括 render 函数中；
+
+Context.Consumer
+
+- 这里，React 组件也可以订阅到 context 变更。这样让你在 函数式组件 中完成订阅 context。
+- 这里需要函数作为子元素(function as child) 这种做法；
+- 这个函数接收当前的 context 值，返回一个React节点；
+
+**Context 的基本使用**
+
+什么时候使用默认值 defaultValue呢❓
+
+- 当内部组件不在Context.Provider内部还需要获取默认赋值时
+
+什么时候使用Context.Consumer呢❓
+
+- 当使用value的组件是一个函数式组件时；
+- 当组件中需要使用多个Context时；
 
 #### 6. setState的使用详解
 

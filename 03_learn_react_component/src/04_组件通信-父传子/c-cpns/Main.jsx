@@ -6,10 +6,11 @@ export class Main extends Component {
   constructor() {
     super();
     this.state = {
-      banners: ["喜羊羊与灰太狼", "熊出没", "火力少年王"],
-      productList: ["苹果", "香蕉", "西瓜"],
+      banners: [],
+      productList: [],
     };
   }
+
   render() {
     const { banners, productList } = this.state;
     return (

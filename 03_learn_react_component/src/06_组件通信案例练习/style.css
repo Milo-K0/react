@@ -1,0 +1,18 @@
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.item {
+  height: 60px;
+  flex: 1;
+}
+
+.item.active {
+  color: red;
+}
+.item.active .text {
+  border-bottom: 2px solid red;
+}
