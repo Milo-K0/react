@@ -797,3 +797,222 @@ Context.Consumer
 
 #### 6. setState的使用详解
 
+**为什么使用setState❓**
+
+开发中我们并不能直接通过修改state的值来让界面发生更新：
+
+- 因为我们修改了state之后，希望React根据最新的State来重新渲染界面，但是这种方式的修改React并不知道数据发生了变化；
+- React并没有实现类似于Vue2中的Object.defineProperty或者Vue3中的Proxy的方式来监听数据的变化；
+- 我们必须通过setState来告知React数据已经发生了变化；
+
+疑惑：在组件中并没有实现setState的方法，为什么可以调用呢❓
+
+- 原因很简单，setState方法是从Component中继承过来的。
+
+#### 7. setState 异步更新
+
+setState的更新是异步的❓
+
+```jsx
+class App extend React.Component {
+    constructor() {
+        super()
+        this.state = {
+            message: "hello world"
+        }
+    }
+    changeMessage() {
+        this.setState({
+            message: '你好世界'
+        })
+        console.log(this.state)
+    }
+    render() {
+        const {message} = this.state
+        return (
+        	<div>
+                <h1 onClick= {e => this.changeMessage()}>
+                	{message}
+                </h1>
+            </div>)
+    }
+}
+```
+
+- 最终打印结果是hello world；
+- 可见setState是异步的操作，我们并不能在执行完setState之后立马拿到最新的state的结果；
+
+为什么setState设计为异步呢❓
+
+- setState设计为异步，可以**显著提升性能**；
+
+  如果每次调用 setState 都进行一次更新，那么意味着 render 函数会被频繁调用，界面重新渲染，这样效率是很低的；
+
+  最好的办法应该是获取到多个更新，之后进行批量更新；
+
+- 如果同步更新了state，但是还没有执行render函数，那么state和props不能保持同步；
+
+  state和props不能保持一致性，会在开发中产生很多的问题；
+
+那么如何获取更新后的值呢❓
+
+- 方式一：setState 的回调
+
+  setState 接受两个参数: 第二个参数是一个回调函数，这个回调函数在更新后会执行；
+
+  格式如下: setState(partialState, callback)
+
+  ```jsx
+  ##changeText() {
+      this.setState({
+          message: "你好啊，李银河"
+      }, () => {
+          console.log(this.state.message)
+      })
+  }
+  ```
+
+- 我们也可以在生命周期函数中获取:
+
+  ```jsx
+  componentDidUpdate(prevProps, provState, snapshot) {
+  	console.log(this.state.message)
+  }
+  ```
+
+setState一定是异步吗❓
+
+react18之前，分两种情况
+
+- 在组件生命周期或React合成事件中，setState是异步；
+- 在setTimeout或者原生dom事件中，setState是同步；
+
+react18之后，默认都放到批处理中(异步)
+
+### 五. React组件化开发(二)
+
+#### 1. React性能优化SCU
+
+**React更新机制**
+
+react的渲染流程
+
+jsx -> 虚拟DOM -> 真实DOM
+
+React的更新流程
+
+- props/state改变 -> render函数重新执行 -> 产生新的DOM树 -> 新旧DOM树进行diff -> 计算出差异进行更新 -> 更新到真实的DOM
+
+- 如果一棵树参考另外一棵树进行完全比较更新，那么即使是最先进的算法，该算法的复杂程度为O(n²)，其中n是树中元素的数量；
+
+- 如果在React中使用了该算法，那么展示1000个元素所需要执行的计算量将在十亿的量级范围；
+- 这个开销太过昂贵了，React的更新性能会变得非常低效；
+
+**React对这个算法进行了优化，将其优化成了O(n)，如何优化的呢❓**
+
+- 同层节点之间相互比较，不会跨节点比较；
+- 不同类型的节点，产生不同的树结构；
+- 开发中，可以通过key来指定哪些节点在不同的渲染下保持稳定；
+
+**key的优化**(不同情况下使用key)
+
+- 方式一：在最后位置插入数据
+
+  这种情况，有无key意义并不大
+
+- 方式二：在前面插入数据
+
+  这种做法，在没有key的情况下，所有的li都需要进行修改；
+
+- 当子元素拥有key 时，React 使用key 来匹配原有树上的子元素以及最新树上的子元素：
+
+  在下面这种场景下，key为111和222的元素仅仅进行位移，不需要进行任何的修改；
+
+  将key为333的元素插入到最前面的位置即可；
+
+- key的注意事项：
+
+  key应该是唯一的；
+
+  key不要使用随机数（随机数在下一次render时，会重新生成一个数字）；
+
+  使用index作为key，对性能是没有优化的；
+
+**render函数被调用**
+
+我们使用之前的一个嵌套案例：
+
+- 在App中，我们增加了一个计数器的代码；
+- 当点击 +1 时，会重新调用App的render函数；
+- 而当App的render函数被重新调用时，所有的子组件的render函数都会被重新调用；
+
+那么我们可以思考一下，在以后的开发中，我们只要是修改了App中的数据，所有的组件都需要重新render，进行diff算法，性能必然是很低的：
+
+- 事实上，很多的组件没有必要重新render；
+- 它们调用render应该有一个前提，就是依赖的数据(state、props)发生改变时，再调用自己的render方法；
+
+如何控制render方法是否被调用呢❓
+
+- 通过shouldComponentUpdate方法即可；
+
+**shouldComponentUpdate**
+
+React给我们提供了一个生命周期方法 shouldComponentUpdate（很多时候，我们简称SCU），这个方法接受参数，并且需要有返回值：
+
+该方法有两个参数：
+
+- 参数一：**nextProps** 修改之后，最新的props属性
+- 参数二：**nextState** 修改之后，最新的state属性
+
+该方法返回值是一个boolean类型：
+
+- 返回值为true，那么就需要调用render方法
+- 返回值为false，那么就不需要调用render方法
+- 默认返回的是true，也就是只要state发生改变，就会调用render方法；
+
+比如我们在App中增加一个message属性：
+
+- jsx中并没有依赖这个message，那么它的改变不应该引起重新渲染；
+- 但是因为render监听到state的变化，就会重新render，所以最后render方法还是被重新调用了；
+
+**PureComponent**
+
+如果所有的类，我们都需要手动来实现 shouldComponentUpdate，那么会给我们开发者增加非常多的工作量。
+
+- 我们来设想一下 shouldComponentUpdate 中的各种判断的目的是什么❓
+- props或者state 中的数据是否发生了改变，来决定shouldComponentUpdate返回true或者false；
+
+事实上React已经考虑到了这一点，所以React已经默认帮我们实现好了，如何实现呢❓
+
+- 将class继承自PureComponent
+
+**shallowEqual方法**
+
+这个方法中，调用!shallowEqual(oldProps, newProps) || !shallowEqual(oldState, newState)，这个shallowEqual就是进行浅层比较
+
+**高阶组件 memo**
+
+目前我们是针对组件可以使用PureComponent，那么函数式组件呢❓
+
+- 事实上函数式组件我们在props没有改变时，也是不希望其重新渲染其DOM树结构的
+
+我们需要使用一个高阶组件memo：
+
+- 我们将之前的Header、Banner、ProductList都通过memo函数进行一层包裹；
+- Footer没有使用memo函数进行包裹；
+- 最终的效果是，当counter发生改变时，Header、Banner、ProductList的函数不会重新执行；
+- 而Footer的函数会重新执行；
+
+**不可变数据的力量**
+
+案例位置：react\03_learn_react_component\src\13_数据不可变的力量\App.jsx
+
+#### 2. 获取DOM方式refs
+
+#### 3. 受控和非受控组件
+
+#### 4. React的高阶组件
+
+#### 5. portals和fragment
+
+#### 6. StrictMode严格模式
